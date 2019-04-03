@@ -37,6 +37,7 @@
         var game = new Phaser.Game(config);
 
         function preload() {
+            //this.load.image('buttonBG', 'assets/sprites/button-bg.png');
             this.load.image('sky', 'assets/sky.png');
             this.load.image('ground', 'assets/platform.png');
             this.load.image('star', 'assets/star.png');
@@ -50,6 +51,9 @@
         let player
         let score = 0;
         let scoreText;
+        let graphics
+        let follower;
+        let path;
         function create() {
             this.add.image(400, 300, 'sky');
 
@@ -78,6 +82,25 @@
                 child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
 
             });
+            //spin object
+            graphics = this.add.graphics();
+
+            follower = { t: 0, vec: new Phaser.Math.Vector2() };
+            path = new Phaser.Curves.Path(300, 500);
+            path.circleTo(50);
+            //  We can move the path to 500x300 without creating any extra duration
+            path.moveTo(200, 300);
+            //  Rotate this circle so it completes the loop
+            path.circleTo(100, true, 180);
+
+            this.tweens.add({
+                targets: follower,
+                t: 1,
+                ease: 'Linear',
+                duration: 19000,
+                repeat: -1
+            });
+
 
             //player
             player = this.physics.add.sprite(500, 100, 'dude');
@@ -143,6 +166,19 @@
             if (cursors.up.isDown && player.body.touching.down) {
                 player.setVelocityY(-530);
             }
+
+
+            //
+            
+            graphics.clear();
+            //graphics.lineStyle(2, 0xffffff, 1);
+
+            //path.draw(graphics);
+
+            path.getPoint(follower.t, follower.vec);
+
+            graphics.fillStyle(0xff0000, 1);
+            graphics.fillCircle(follower.vec.x, follower.vec.y, 17);
         }
 
         function collectStar(player, star) {
